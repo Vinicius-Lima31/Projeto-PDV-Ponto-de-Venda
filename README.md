@@ -1,5 +1,5 @@
 # PDV-Ponto-de-Venda
-Projeto ainda em desenvolvimento...
+Projeto Spring em desenvolvimento...
 
 ## Dependências utilizadas
 * spring-boot-starter-data-jpa
