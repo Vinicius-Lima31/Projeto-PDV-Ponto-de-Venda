@@ -1,7 +1,9 @@
 package org.gm2.pdv.controller;
 
+import org.gm2.pdv.dto.ResponseDTO;
 import org.gm2.pdv.entity.User;
-import org.gm2.pdv.repository.UserRepository;
+import org.gm2.pdv.exceptions.NoItemException;
+import org.gm2.pdv.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,13 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     // SELECT * FROM
     @GetMapping
     public ResponseEntity getAll() {
         try{
-            return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
         }
         catch (Exception error) {
             return new ResponseEntity<>(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -33,25 +35,24 @@ public class UserController {
     public ResponseEntity post(@RequestBody User user) {
         try {
             user.setEnabled(true);
-            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+            return new ResponseEntity<>(userService.save(user), HttpStatus.OK);
         } catch (Exception error) {
             return new ResponseEntity<>(error.getMessage(), HttpStatus.OK);
         }
     }
 
-    // UPDATE
+    // UPDATE (Método update do UserService)
     @PutMapping
     public ResponseEntity put(@RequestBody User user) {
-        // Optional<> é uma List com diferentes métodos
-        Optional<User> userToEdit = userRepository.findById(user.getId());
-
-        // isPresent vai ver se existe algo com aquele ID
-        if (userToEdit.isPresent()) {
-            return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.update(user), HttpStatus.OK);
         }
-
-        // Caso não tenha esse ID, vamos usar esse Return
-        return ResponseEntity.notFound().build();
+        catch (NoItemException error) {
+            return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // DELETE
@@ -62,11 +63,11 @@ public class UserController {
 
         try{
             // deleteById não possui retorno, por isso defini ela aqui
-            userRepository.deleteById(id);
-            return new ResponseEntity<>("Usuario " + id + " Removido com sucesso", HttpStatus.OK);
+            userService.deleteById(id);
+            return new ResponseEntity<>(new ResponseDTO("Usuario " + id + " Removido com sucesso"), HttpStatus.OK);
         }
         catch (Exception error) {
-            return new ResponseEntity(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(new ResponseDTO(error.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 }

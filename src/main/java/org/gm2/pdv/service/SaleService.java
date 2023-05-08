@@ -17,9 +17,12 @@ import org.gm2.pdv.repository.SaleRepository;
 import org.gm2.pdv.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,18 +55,24 @@ public List<SaleInfoDTO> findAll() {
 
 // Quero retornar um SaleInfoDTO, esse método é da linha 47
 private SaleInfoDTO getSaleInfo(Sale sale) {
-    SaleInfoDTO saleInfoDTO = new SaleInfoDTO();
 
-    saleInfoDTO.setUser(sale.getUser().getName()); // Passar nome do usuário
-    saleInfoDTO.setDate(sale.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-    saleInfoDTO.setProducts(getProductInfo(sale.getItems()));
-
-    return saleInfoDTO;
+    return SaleInfoDTO.builder()
+            .user(sale.getUser().getName())
+            .date(sale.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+            .products(getProductInfo(sale.getItems()))
+            .build();
 }
 
 // Método responsavel por transformar meu Products acima em uma List de ProductInfoDTO
+    // Acima eu preciso que seja retornada uma Lista de ProductInfoDTO e não um ItemSale
 private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
+
+    if(CollectionUtils.isEmpty(items)){
+        return Collections.emptyList();
+    }
+
     return items.stream().map(item -> {
+
         ProductInfoDTO productInfoDTO = new ProductInfoDTO();
 
         productInfoDTO.setId(item.getId());
@@ -98,6 +107,7 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
         newSale.setDate(LocalDate.now());
         List<ItemSale> items = getItemSale(sale.getItems());
 
+
         newSale = saleRepository.save(newSale);
 
         saveItemSale(items, newSale);
@@ -127,7 +137,8 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
         }
 
         return products.stream().map(item -> {
-            Product product = productRepository.getReferenceById(item.getProductid());
+            Product product = productRepository.findById(item.getProductid())
+                    .orElseThrow(() -> new NoItemException("Item da venda não encontrado"));
 
             ItemSale itemSale = new ItemSale();
             itemSale.setProduct(product);
