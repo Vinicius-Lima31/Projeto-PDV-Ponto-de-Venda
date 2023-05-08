@@ -5,21 +5,16 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.List;
 
-public class ResponseDTO <T>{
+public class ResponseDTO {
 
     @Getter
     private List<String> messages;
 
-    @Getter
-    private T data;
-
-    public ResponseDTO(List<String> messages, T data) {
+    public ResponseDTO(List<String> messages) {
         this.messages = messages;
-        this.data = data;
     }
 
-    public ResponseDTO(String message, T data) {
+    public ResponseDTO(String message) {
         this.messages = Arrays.asList(message);
-        this.data = data;
     }
 }

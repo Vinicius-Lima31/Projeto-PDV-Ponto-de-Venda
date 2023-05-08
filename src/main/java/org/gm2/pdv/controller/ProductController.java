@@ -1,5 +1,6 @@
 package org.gm2.pdv.controller;
 
+import org.gm2.pdv.dto.ResponseDTO;
 import org.gm2.pdv.entity.Product;
 import org.gm2.pdv.entity.User;
 import org.gm2.pdv.repository.ProductRepository;
@@ -29,7 +30,7 @@ public class ProductController {
             return new ResponseEntity(productRepository.save(product), HttpStatus.CREATED);
         }
         catch (Exception error) {
-            return new ResponseEntity<>(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -40,7 +41,7 @@ public class ProductController {
             return new ResponseEntity<>(productRepository.save(product), HttpStatus.OK);
         }
         catch (Exception error){
-            return new ResponseEntity<>(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -49,10 +50,10 @@ public class ProductController {
     public ResponseEntity delete(@PathVariable long id) {
         try {
             productRepository.deleteById(id);
-            return new ResponseEntity<>("Produto removido com Sucesso!", HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDTO("Produto id " + id + " removido com Sucesso!"), HttpStatus.OK);
         }
         catch (Exception error) {
-            return new ResponseEntity(error.getMessage(), HttpStatus.OK);
+            return new ResponseEntity(new ResponseDTO(error.getMessage()), HttpStatus.OK);
         }
     }
 
