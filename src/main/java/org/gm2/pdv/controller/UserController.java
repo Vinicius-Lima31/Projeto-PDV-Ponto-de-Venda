@@ -2,7 +2,6 @@ package org.gm2.pdv.controller;
 
 import org.gm2.pdv.dto.ResponseDTO;
 import org.gm2.pdv.entity.User;
-import org.gm2.pdv.exceptions.NoItemException;
 import org.gm2.pdv.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/user")
@@ -32,7 +31,7 @@ public class UserController {
 
     // INSERT INTO
     @PostMapping()
-    public ResponseEntity post(@RequestBody User user) {
+    public ResponseEntity post(@Valid @RequestBody User user) {
         try {
             user.setEnabled(true);
             return new ResponseEntity<>(userService.save(user), HttpStatus.OK);
@@ -43,13 +42,11 @@ public class UserController {
 
     // UPDATE (Método update do UserService)
     @PutMapping
-    public ResponseEntity put(@RequestBody User user) {
+    public ResponseEntity put(@Valid @RequestBody User user) {
         try {
             return new ResponseEntity<>(userService.update(user), HttpStatus.OK);
         }
-        catch (NoItemException error) {
-            return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+
         catch (Exception error) {
             return new ResponseEntity<>(new ResponseDTO(error.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

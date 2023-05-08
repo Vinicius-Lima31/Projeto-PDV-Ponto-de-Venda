@@ -71,18 +71,14 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
         return Collections.emptyList();
     }
 
-    return items.stream().map(item -> {
-
-        ProductInfoDTO productInfoDTO = new ProductInfoDTO();
-
-        productInfoDTO.setId(item.getId());
-
-        productInfoDTO.setDescription(item.getProduct().getDescription());
-        productInfoDTO.setQuantity(item.getQuantity());
-
-        return productInfoDTO;
-
-    }).collect(Collectors.toList());
+    return items.stream().map(
+            item ->
+                ProductInfoDTO.builder()
+                    .id(item.getId())
+                    .description(item.getProduct().getDescription())
+                    .quantity(item.getQuantity())
+                    .build()
+    ).collect(Collectors.toList());
 }
 
 
