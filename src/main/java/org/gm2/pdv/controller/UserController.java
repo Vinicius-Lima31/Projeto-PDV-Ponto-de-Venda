@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -22,7 +20,12 @@ public class UserController {
     // SELECT * FROM
     @GetMapping
     public ResponseEntity getAll() {
-        return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+        try{
+            return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
+        }
+        catch (Exception error) {
+            return new ResponseEntity<>(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // INSERT INTO
@@ -47,6 +50,7 @@ public class UserController {
             return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
         }
 
+        // Caso não tenha esse ID, vamos usar esse Return
         return ResponseEntity.notFound().build();
     }
 
@@ -59,7 +63,7 @@ public class UserController {
         try{
             // deleteById não possui retorno, por isso defini ela aqui
             userRepository.deleteById(id);
-            return new ResponseEntity<>("Usuario Removido com sucesso", HttpStatus.OK);
+            return new ResponseEntity<>("Usuario " + id + " Removido com sucesso", HttpStatus.OK);
         }
         catch (Exception error) {
             return new ResponseEntity(error.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
