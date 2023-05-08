@@ -29,3 +29,4 @@ public class ItemSale {
     @Column(nullable = false)
     private int quantity;
 }
+

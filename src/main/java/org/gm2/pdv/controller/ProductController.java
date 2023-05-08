@@ -16,11 +16,13 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
+    // SELECT * FROM
     @GetMapping
     public ResponseEntity getAll() {
         return new ResponseEntity<>(productRepository.findAll(), HttpStatus.OK);
     }
 
+    // INSERT
     @PostMapping
     public ResponseEntity post(@RequestBody Product product) {
         try {
@@ -31,6 +33,7 @@ public class ProductController {
         }
     }
 
+    // UPDATE
     @PutMapping
     public ResponseEntity put(@RequestBody Product product) {
         try {
@@ -41,7 +44,8 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping
+    // DELETE
+    @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable long id) {
         try {
             productRepository.deleteById(id);
