@@ -2,13 +2,14 @@ package org.gm2.pdv.controller;
 
 import org.gm2.pdv.dto.ResponseDTO;
 import org.gm2.pdv.entity.Product;
-import org.gm2.pdv.entity.User;
 import org.gm2.pdv.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/product")
@@ -25,7 +26,7 @@ public class ProductController {
 
     // INSERT
     @PostMapping
-    public ResponseEntity post(@RequestBody Product product) {
+    public ResponseEntity post(@Valid @RequestBody Product product) {
         try {
             return new ResponseEntity(productRepository.save(product), HttpStatus.CREATED);
         }
@@ -36,7 +37,7 @@ public class ProductController {
 
     // UPDATE
     @PutMapping
-    public ResponseEntity put(@RequestBody Product product) {
+    public ResponseEntity put(@Valid @RequestBody Product product) {
         try {
             return new ResponseEntity<>(productRepository.save(product), HttpStatus.OK);
         }

@@ -3,6 +3,7 @@ package org.gm2.pdv.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -19,6 +20,7 @@ public class User {
 
     // O campo name, vai ter no máximo 100 de tamanho, e não pode ser um campo null
     @Column(length = 100, nullable = false)
+    @NotBlank(message = "Campo nome é obrigatorio")
     private String name;
 
     private boolean isEnabled;

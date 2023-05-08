@@ -76,6 +76,7 @@ public class UserService {
     }
 
     public void deleteById(long id) {
+        // Eu poderia usar orElseThrow em vez do Optional, tanto faz na real
         Optional<User> userOptional = userRepository.findById(id);
         if (!userOptional.isPresent()){
             throw new NoItemException("Não foi possivel localizar usuário!");
