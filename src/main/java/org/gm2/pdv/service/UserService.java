@@ -23,8 +23,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserDTO save(User user){
-        userRepository.save(user);
+    // Trocando para UserDTO
+    public UserDTO save(UserDTO user){
+        User userToSave = new User();
+
+        userToSave.setEnabled(user.isEnabled());
+        userToSave.setName(user.getName());
+
+        userRepository.save(userToSave);
 
         /* Apenas simplificando meu código
         UserDTO newUserDTO = new UserDTO();
@@ -35,7 +41,7 @@ public class UserService {
          */
 
         // Retorando um DTO em vez do User inteiro
-        return new UserDTO(user.getId(), user.getName(), user.isEnabled());
+        return new UserDTO(userToSave.getId(), userToSave.getName(), userToSave.isEnabled());
     }
 
     // Método que retorna um UserDTO pelo ID
@@ -61,18 +67,25 @@ public class UserService {
     }
 
     // PUT (update) do controller
-    public UserDTO update(User user) {
-        Optional<User> userToEdit = userRepository.findById(user.getId());
+    public UserDTO update(UserDTO user) {
+
+        User userToSave = new User();
+
+        userToSave.setEnabled(user.isEnabled());
+        userToSave.setName(user.getName());
+        userToSave.setId(user.getId());
+
+        Optional<User> userToEdit = userRepository.findById(userToSave.getId());
 
         if (!userToEdit.isPresent()){
             throw new NoItemException("Usuário não encontrado!");
         }
 
         // Faz o UPDATE
-        userRepository.save(user);
+        userRepository.save(userToSave);
 
         // Retorna o UserDTO
-        return new UserDTO(user.getId(), user.getName(), user.isEnabled());
+        return new UserDTO(userToSave.getId(), userToSave.getName(), userToSave.isEnabled());
     }
 
     public void deleteById(long id) {

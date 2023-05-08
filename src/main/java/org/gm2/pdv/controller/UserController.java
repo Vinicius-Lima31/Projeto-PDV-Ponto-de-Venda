@@ -1,6 +1,7 @@
 package org.gm2.pdv.controller;
 
 import org.gm2.pdv.dto.ResponseDTO;
+import org.gm2.pdv.dto.UserDTO;
 import org.gm2.pdv.entity.User;
 import org.gm2.pdv.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class UserController {
 
     // INSERT INTO
     @PostMapping()
-    public ResponseEntity post(@Valid @RequestBody User user) {
+    public ResponseEntity post(@Valid @RequestBody UserDTO user) {
         try {
             user.setEnabled(true);
             return new ResponseEntity<>(userService.save(user), HttpStatus.OK);
@@ -42,7 +43,7 @@ public class UserController {
 
     // UPDATE (Método update do UserService)
     @PutMapping
-    public ResponseEntity put(@Valid @RequestBody User user) {
+    public ResponseEntity put(@Valid @RequestBody UserDTO user) {
         try {
             return new ResponseEntity<>(userService.update(user), HttpStatus.OK);
         }
