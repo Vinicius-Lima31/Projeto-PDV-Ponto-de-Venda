@@ -1,7 +1,7 @@
 package org.gm2.pdv.service;
 
 import lombok.RequiredArgsConstructor;
-import org.gm2.pdv.dto.ProductDTO;
+import org.gm2.pdv.dto.ProductSaleDTO;
 import org.gm2.pdv.dto.ProductInfoDTO;
 import org.gm2.pdv.dto.SaleDTO;
 import org.gm2.pdv.dto.SaleInfoDTO;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +37,7 @@ public class SaleService {
     private final ItemSaleRepository itemSaleRepository;
 
     /*
+    findAll (SELECT)
         {
             "user": "Fulando",
             "data": "03/07/2022",
@@ -56,15 +57,36 @@ public List<SaleInfoDTO> findAll() {
 // Quero retornar um SaleInfoDTO, esse método é da linha 47
 private SaleInfoDTO getSaleInfo(Sale sale) {
 
+    var products = getProductInfo(sale.getItems());
+    BigDecimal total = getTotal(products);
+
     return SaleInfoDTO.builder()
             .user(sale.getUser().getName())
             .date(sale.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-            .products(getProductInfo(sale.getItems()))
+            .products(products)
+            .total(total) // Setando valor total
             .build();
 }
 
+// Método para calcular valor total dos Products
+private BigDecimal getTotal(List<ProductInfoDTO> products) {
+    // Assim que definimos um valor inicial de um BigDecimal
+    BigDecimal total = new BigDecimal(0);
+
+    // Vou percorrer toda List de ProductInfoDTO, em cada venda vou fazer a operação do valor total
+    for (int i = 0; i < products.size(); i++) {
+        ProductInfoDTO currentProduct = products.get(i);
+
+        total = total.add(currentProduct.getPrice()
+                .multiply(new BigDecimal(currentProduct.getQuantity())));
+    }
+
+    // Retornando o total de vendas por User
+    return total;
+}
+
 // Método responsavel por transformar meu Products acima em uma List de ProductInfoDTO
-    // Acima eu preciso que seja retornada uma Lista de ProductInfoDTO e não um ItemSale
+// Acima eu preciso que seja retornada uma Lista de ProductInfoDTO e não um ItemSale
 private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
 
     if(CollectionUtils.isEmpty(items)){
@@ -75,6 +97,7 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
             item ->
                 ProductInfoDTO.builder()
                     .id(item.getId())
+                    .price(item.getProduct().getPrice())   // Setando o Valor
                     .description(item.getProduct().getDescription())
                     .quantity(item.getQuantity())
                     .build()
@@ -112,7 +135,7 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
 
     }
 
-    // Função da linha 49
+    // Função da linha 106
     // Aqui estamos fazendo o salvamento, já salvamos o sale,
     // Agora estamos salvando o ItemSale, de sale para ItemSale
     private void saveItemSale (List<ItemSale> items, Sale newSale){
@@ -125,7 +148,7 @@ private List<ProductInfoDTO> getProductInfo(List<ItemSale> items) {
 
     // Vou retornar uma List com <ItemSale> para estar setando no newSale
     // Passando no método acima "public long save(SaleDTO sale)"
-    private List<ItemSale> getItemSale(List<ProductDTO> products) {
+    private List<ItemSale> getItemSale(List<ProductSaleDTO> products) {
 
         // Pacote exceptions, tratações de erros
         if(products.isEmpty()) {
